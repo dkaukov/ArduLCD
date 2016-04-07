@@ -1,3 +1,4 @@
+// vim ts=4 noexpandtab ai
 #include <avr/io.h>
 #include <util/delay.h>
 #include <Arduino.h>
@@ -5,6 +6,7 @@
 // based on info got from here:
 // http://lcdproc.cvs.sourceforge.net/viewvc/lcdproc/lcdproc/server/drivers/hd44780-serial.h?content-type=text%2Fplain
 
+// Your LCD dimensions, in number of chars WxH
 const int LCDW = 20;
 const int LCDH = 4;
 
@@ -25,7 +27,7 @@ void setup() {
 	// set up the LCD's number of columns and rows:
 	lcd.begin(LCDW, LCDH);
 	// set up serial
-	Serial.begin(19200); 
+	Serial.begin(57600); 
 	lcd.display();
 	lcd.noCursor();
 	lcd.clear();
@@ -44,7 +46,7 @@ void loop() {
 			case 0x11:
 				// Write LCD instruction -- used by lcdproc driver
                 while (1) {
-                	cmd = Serial.read();
+					cmd = Serial.read();
 					if (cmd != -1) { break; }
                 }   
                 lcd.command(cmd);
@@ -52,11 +54,20 @@ void loop() {
 			case 0x12:
 				// Write LCD Data -- used by lcdproc driver
                 while (1) {
-                	cmd = Serial.read();
+					cmd = Serial.read();
 					if (cmd != -1) { break; }
                 }   
                 lcd.write(cmd);
 				break;
+			case 0x00:
+                while (1) {
+					cmd = Serial.read();
+					if (cmd != -1) { break; }
+                }   
+                lcd.write(cmd);
+				break;
+
+		
 			default:
 				lcd.write(cmd);
 				break;

@@ -15,8 +15,9 @@ Well, I found a user manual for the original PIC-an-LCD: http://www.phanderson.c
 
 Turns out the protocol is far more advanced than I expected, allowing for quite a bit of control, higher level LCD functions, and the ability to either output a tone from a speaker, or to fire off 4 GPIO pins.
 
-In addition, after looking at the lcdproc source code, none of the advanced features are used. lcdproc basically just uses the "raw passthrough" escape characters to talk to the lcd directly. 
-
+In addition, after looking at the lcdproc source code, none of the advanced features are 
+used. lcdproc basically just uses the "raw passthrough" escape characters to talk to the l
+cd directly.
 
 -- 29/03/2016
 

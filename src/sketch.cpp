@@ -71,7 +71,8 @@ void setup() {
 
   analogWrite(BR, 0); // Set maximum brightness.
 
-  lcd.print(sprinf("ArduLCD Version %d",VERSION));
+  lcd.print("ArduLCD Version");
+  lcd.print(VERSION);
   lcd.setCursor(1, 1);
   lcd.print("Matrix Orbital!");
 }

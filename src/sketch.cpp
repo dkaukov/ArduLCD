@@ -137,7 +137,6 @@ void loop() {
                   break;
                 case 7: // Read module type
                   Serial.print(9); // 9 for LK204-25
-				  Serial.print("\n");
                   break;
                 case 80: // Set contrast (1 parameter, contrast)
                   analogWrite(BR, 0xFF-serial_getch());

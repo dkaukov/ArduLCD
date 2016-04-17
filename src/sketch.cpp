@@ -209,10 +209,10 @@ void loop() {
                    and parameter byte is discarded. */
                   temp = serial_getch();
                   break;
-  			}
 
-		    // Otherwise its a plain char so we print it to the LCD.
-			lcd.write(rxbyte);
+		    	// Otherwise its a plain char so we print it to the LCD.
+				lcd.write(rxbyte);
+  			}
 		}
 	}
 }

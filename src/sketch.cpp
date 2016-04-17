@@ -126,12 +126,12 @@ void loop() {
                     lcd.print(serial_getch());
                   }
                   break;
-                case 35: 
-				  Serial.print("417264754C4344");// Read serial number
-				  break;
-                case 36: 
-				  Serial.print(VERSION); // Read version number
-				  break;
+                //case 35: 
+				//  Serial.print("417264754C4344");// Read serial number
+				//  break;
+                //case 36: 
+				//  Serial.print(VERSION); // Read version number
+				//  break;
                 case 54: // Read version number
                   Serial.print(VERSION);
                   break;
@@ -162,7 +162,7 @@ void loop() {
                 case 88: // Clear screen
                   lcd.clear();
                   break;
-//                case 35: // Place large number
+                case 35: // Place large number
                 case 38: // Poll key presses
                 case 51: // Change I2C slave address (1 parameter, address)
                 case 57: // Change baud rate (1 parameter, baud rate)
@@ -209,10 +209,11 @@ void loop() {
                    and parameter byte is discarded. */
                   temp = serial_getch();
                   break;
+			}
 
-		    	// Otherwise its a plain char so we print it to the LCD.
-				lcd.write(rxbyte);
-  			}
 		}
+		// Otherwise its a plain char so we print it to the LCD.
+		lcd.write(rxbyte);
+  			
 	}
 }

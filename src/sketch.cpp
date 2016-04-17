@@ -1,38 +1,22 @@
 /*
  * vim: ts=4 ai
-
- arduino-matrixorbital.ino
- A software emulator for Matrix Orbital character display commands on Arduino.
-
- == 17.04.2016 - Import from https://code.google.com/archive/p/arduino-matrixorbital ==
-Licence Listed as:  GNU GPL v3
-
- V1.5 28/12/2011
- Added fixes by yosoyzenitram, prettified code a little and added all Matrix Obrital commands for display model LK204-25.
- 
- V1.0 6/2/2010
- Coded by giannoug <giannoug@gmail.com>
- Based on code by nuelectronics <http://www.nuelectronics.com/>
- 
- You can use whatever screen size you want, but you will
- have to make proper adjustments to both this file and at
- LCDSmartie's configuration menu or whatever program you
- might use.
- 
- Matrix Orbital LK204-25 manual (for command reference):
- http://www.matrixorbital.ca/manuals/LK_Series/LK204-25/LVK204-25%20%28Rev1.3%29.pdf
- 
- The circuit (make sure to power the LCD):
- * LCD RS pin to digital pin 12
- * LCD E pin to digital pin 11
- * LCD D4 pin to digital pin 5
- * LCD D5 pin to digital pin 4
- * LCD D6 pin to digital pin 3
- * LCD D7 pin to digital pin 2
- * LCD Ve pin (contrast) to digital pin 6
- 
+ *
+ * Copyright 2016 Ziva-Vatra ( zv@ziva-vatra.com - Belgrade )
+ * Licensed under the GNU GPL v2 or later.
+ *
+ * ArduLCD Matrix Orbital emulator for Arduino - 17.04.2016 
+ *
+ * LCD 8 bit mode
+ *
+ * Inspired by https://code.google.com/archive/p/arduino-matrixorbital
+ * but in the end wrote my own version (couldn't get the above to work).
+ *
+ * Made use of the Matrix Orbital manual (in reference folder).
+ * Also made use of the LCDproc driver:
+ * http://lcdproc.cvs.sourceforge.net/viewvc/lcdproc/lcdproc/server/drivers/MtxOrb.c?view=markup
+ *
  */
-
+ 
 #include <LiquidCrystal.h>
 #include <avr/io.h>
 #include <util/delay.h>
@@ -55,13 +39,15 @@ Licence Listed as:  GNU GPL v3
 #define D7 2
 #define BR 6
 
-#define VERSION 2
+#define VERSION 3
 
 #define GPO1 10 // Not yet implemented. (pg. 18 of the manual)
 
 // Define the size of your LCD here
 #define LCDW 24
 #define LCDH 2
+
+
 //LiquidCrystal lcd(RS, E, D7, D6, D5, D4, D3, D2, D1, D0);
 LiquidCrystal lcd(RS, E, D0, D1, D2, D3, D4, D5, D6, D7);
 //D4, D5, D6, D7);
@@ -71,16 +57,20 @@ void setup() {
 	lcd.begin(LCDW, LCDH); // Change this for other screen sizes.
 
 	analogWrite(BR, 0); // Set maximum brightness.
-
+/*
 	lcd.print("ArduLCD Version ");
 	lcd.print(VERSION);
-	lcd.setCursor(1, 1);
+	lcd.setCursor(0, 1);
 	lcd.print("Matrix Orbital!");
+
+	//Defaults
+    lcd.autoscroll();
+	*/
 }
 
 //Fast wait until byte is received, then returns it. 
 char cmd;
-char serial_getch() {
+char sget() {
 	while(1) {
 		cmd = Serial.read();
 		if (cmd == -1) { continue; }
@@ -89,131 +79,228 @@ char serial_getch() {
 }
 
 
+char in; //our received bytea
+char x; //bitbucket
 void loop() {
-	char rxbyte,temp;
 	while(1) {
-		rxbyte = serial_getch();
-		if (rxbyte == 0xFE) {
-			switch (serial_getch()) {
-			    case 71: // Set cursor position (2 parameters, column, row)
-				  lcd.setCursor(serial_getch() - 1, serial_getch() - 1);
-				  break;
-			    case 72: // Cursor home (doesn't clear the screen!)
-			      //lcd.home();
-			      lcd.setCursor(0,0);
-				  break;
-                case 74: // Underline cursor on
-                  lcd.cursor();
-                  break;
-                case 75: // Underline cursor off
-                  lcd.noCursor();
-                  break;
-                case 83: // Block cursor on
-                  lcd.blink();
-                  break;
-                case 84: // Block cursor off
-                  lcd.noBlink();
-                  break;
-                case 76: // Move cursor left
-                  lcd.command(16);
-                  break;
-                case 77: // Move cursor right
-                  lcd.command(20);
-                  break;
-                case 78: // Define custom character (2 parameters, id, data)
-                  lcd.command(64 + (serial_getch() * 8));
-                  for (temp = 7; temp != 0; temp--) {
-                    lcd.print(serial_getch());
-                  }
-                  break;
-                //case 35: 
-				//  Serial.print("417264754C4344");// Read serial number
-				//  break;
-                //case 36: 
-				//  Serial.print(VERSION); // Read version number
-				//  break;
-                case 54: // Read version number
-                  Serial.print(VERSION);
-                  break;
-                case 7: // Read module type
-                  Serial.print(9); // 9 for LK204-25
-                  break;
-                case 80: // Set contrast (1 parameter, contrast)
-                  analogWrite(BR, 0xFF-serial_getch());
-                  break;
-                case 81: // Auto scroll on
-                  lcd.autoscroll();
-                  break;
-                case 82: // Auto scroll off
-                  lcd.noAutoscroll();
-                  break;
-                case 86: // General Purpose Output off (1 parameter, number)
-                  //temp = serial_getch();
-                  //if (temp == 1) {
-                  //  digitalWrite(GPO1, LOW);
-                  //}
-                  break;
-                case 87: // General Purpose Output on (1 parameter, number)
-                  //temp = serial_getch();
-                  //if (temp == 0) {
-                  //  digitalWrite(GPO1, HIGH);
-                  //}
-                  break;
-                case 88: // Clear screen
-                  lcd.clear();
-                  break;
-                case 35: // Place large number
-                case 38: // Poll key presses
-                case 51: // Change I2C slave address (1 parameter, address)
-                case 57: // Change baud rate (1 parameter, baud rate)
-                case 59: // Exit flow-control mode
-                case 61: // Place vertical bar (2 parameters, column, length)
-                case 64: // Change the startup screen
-                case 65: // Auto transmit keypresses on
-                case 67: // Auto line wrap on
-                case 68: // Auto line wrap off
-                case 66: // Backlight on (1 parameter, minutes)
-                case 69: // Clear key buffer
-                case 70: // Backlight off
-                case 79: // Auto transmit keypress off
-                case 85: // Set debounce time (1 paramater, time)
-                case 96: // Auto repeat mode off
-                case 152: // Set and save brightness (1 parameter, brightness)
-                case 153: // Set backlight brightness (1 parameter, brightness)
-                case 104: // Initialize horizontal bar
-                case 109: // Initialize medium number
-                case 110: // Initialize lange numbers
-                case 111: // Place medium numbers
-                case 115: // Initialize narrow vertical bar
-                case 118: // Initialize wide vertical bar
-                case 124: // Place horizontal bar graph (4 parameters, column, row, direction, length)
-                case 126: // Set auto repeat mode (1 parameter, mode)
-                case 145: // Set and save contrast (1 parameter, contrast)
-                case 160: // Transmission protocol select (1 parameter, protocol)
-                case 192: // Load custom characters (1 parameter, bank)
-                case 164: // Setting a non-standart baudrate (1 parameter, speed)
-                case 193: // Save custom character (3 parameters, bank, id, data)
-                case 194: // Save startup screen custom characters (2 parameters, id, data)
-                case 195: // Set startup GPO state (2 parameters, number, state)
-                case 200: // Dallas 1-Wire
-                  switch (serial_getch()) {
-                  case 1: // Dallas 1-Wire transaction (6 parameters, flags, send, bits, receive, bits, data)
-                  case 2: // Search for a 1-Wire device
-                  default:
-                    break;
-                  }
-                  break;
-                case 213: // Assign keypad codes
-                default:
-                  /* All other commands are ignored 
-                   and parameter byte is discarded. */
-                  temp = serial_getch();
-                  break;
-			}
+		in = sget();
+		
+		if (in == 0xFE) {
+			switch (sget()) {
+				// From lcdproc
+				case 0x37:
+					// Return byte indicating LCD type
+					Serial.write((uint8_t)9);
+					Serial.flush();
+					break;
+				case 0x36:
+					// Returns firmware revision (1 byte)
+					Serial.write((uint8_t)VERSION);
+					Serial.flush();
+					break;
+				case 0x35:
+					// Return Serial number (2 bytes)
+					Serial.write(0xF0);
+					Serial.write(0x0F);
+					Serial.flush();
+					break;
 
+
+				// From the manual
+				case 0x33:
+					// Change I2C Slave address (not implemented)
+					x = sget(); //next byte is addr
+					break;
+				case 0x39:
+					// Change the baud rate
+					x = sget();
+					switch(sget()) {
+						case 83:
+							x = 1200;
+							break;
+						case 41:
+							x = 2400;
+							break;
+						case 207:
+							x = 4800;
+							break;
+						case 103:
+							x = 9600;
+							break;
+						case 51:
+							x = 19200;
+							break;
+						case 34:
+							x = 28800;
+							break;
+						case 25:
+							x = 38400;
+							break;
+						case 15:
+							x = 57600;
+							break;
+						case 8:
+							x = 115200;
+							break;
+						default:
+							break;
+					}
+					Serial.end();
+					Serial.begin(x);
+					break;
+				case 0xA4:
+					// Set custom baud rate (and pray the Oscillator is 16MHz)
+					Serial.end();
+					Serial.begin(sget());
+					break;
+				case 0xA0:
+					// Set protocol (UART or I2C) for the LCD->TARGET direction
+					// (so can differ from in direction). Not implemented
+					x = sget();
+					break;
+				case 0x51:
+					// The entire contents of screen are shifted up one line when
+					// the end of the screen is reached. Default is on.
+					lcd.autoscroll();
+					break;
+				case 0x52:
+					// New text is written over the top line when the end of the 
+					// screen is reached. Default is off (no autoscroll)
+					lcd.noAutoscroll();
+					break;
+				case 0x58:
+					// Clears the screen
+					lcd.clear();
+					break;
+				case 0x40:
+					// Changes start up message (not implemented)
+					for (int x = 0; x != 80; x++)
+						x = sget();
+					break;
+				case 0x43:
+					// Enable auto line wrap (not implemented)
+					break;
+				case 0x44:
+					// Disable auto line wrap (not implemented)
+					break;
+				case 0x47:
+					// Set cursor position (2 parameters, column, row)
+				    lcd.setCursor(sget() - 1, sget() - 1);
+					break;
+				case 0x48:
+					// Set cursor to home position (0,0)
+					lcd.setCursor(0,0);
+					break;
+				case 0x4C:
+                	// Move cursor to the left
+				    lcd.command(16);
+					break;
+				case 0x4D:
+					// Move cursor to the right
+					lcd.command(20);
+					break;
+				case 0x4A:
+					// Enable cursor
+					lcd.cursor();
+					break;
+				case 0x4B:
+					// Disable cursor
+					lcd.noCursor();
+					break;
+				case 0x53:
+					// Enable flashing block
+					lcd.blink();
+					break;
+				case 0x54:
+					// Disable flashing block
+					lcd.noBlink();
+					break;
+				case 0x4E:
+					// Load up custom character
+					lcd.command(64 + (sget() * 8));
+					for ( x = 7; x != 0; x--) {
+						lcd.print(sget());
+					}
+				case 0xC1: 
+					// Save custom character (3 parameters, bank, id, data)
+					// Should be saved to Ardino memory
+					// Not implemented. 10 bytes
+					for ( x = 0; x != 10; x++)
+						sget();
+					break;
+				case 0xC0:
+					// Load custom character bank from memory. Not implemented
+					// 1 byte 
+					sget();
+					break;
+				case 0xC2:
+					// save custom char to memory (not implemented). 
+					// 9 bytes
+					for ( x = 0; x != 9; x++)
+						sget();
+					break;
+				case 0x6D:
+					// Initialise medium number (not implemented)
+					sget();
+				case 0x6F:
+					// Place medium number (3 bytes
+					for ( x = 0; x != 3; x++)
+						sget();
+					break;
+				case 0x6E:
+					// Loads large number (not implemented)
+					break;
+				case 0x23:
+					// Place large number (not implemented) (2 bytes)
+					sget(); sget(); 
+				case 0x68:
+					// Loads horizontal bar (not implemented)
+					break;
+				case 0x7C:
+					// Place horizontal bar (not implemented) (4 bytes)
+					for ( x = 0; x != 4; x++) { sget(); }
+					break;
+				case 0x73:
+					// Init vertical bar (not implemented)
+					break;
+				case 0x76:
+					// Load vertical bar (not implemented)
+					break;
+				case 0x3D:
+					// Place vertical bar (not implemented) (2 byte)
+					sget(); sget();
+				case 0x56:
+					// GPO off (1 byte)
+					// gpo 1 is pin10 for us
+					x = sget();
+					switch (x) {
+						case 0:
+							digitalWrite(GPO1, LOW);
+						default:
+							break;
+						}
+				case 0x57:
+					// GPO on (1 byte)
+					// gpo 1 is pin10 for us
+					x = sget();
+					switch (x) {
+						case 0:
+							digitalWrite(GPO1, HIGH);
+						default:
+							break;
+						}
+				case 0xC3:
+					 // Set startup GPO state (2 bytes, number, state)
+					 // not implemented
+					 sget(); sget();
+					 break;
+				default:
+					// Ignore other commands, and bin parameters
+					x = sget();
+			}
+		} else {
+			lcd.write(in);
 		}
-		// Otherwise its a plain char so we print it to the LCD.
-		lcd.write(rxbyte);
   			
 	}
 }

@@ -37,25 +37,34 @@ Licence Listed as:  GNU GPL v3
 // You can define your own pins here.
 #define RS 12
 #define E  11
+#define D0 9
+#define D1 8
+#define D2 7
+#define D3 6
 #define D4 5
 #define D5 4
 #define D6 3
 #define D7 2
 #define BR 6
 
-#define VERSION 1
+#define VERSION 2
 
-#define GPO1 8 // Not yet implemented. (pg. 18 of the manual)
+#define GPO1 10 // Not yet implemented. (pg. 18 of the manual)
 
-LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
+// Define the size of your LCD here
+#define LCDW 24
+#define LCDH 2
+LiquidCrystal lcd(RS, E, D7, D6, D5, D4, D3, D2, D1, D0);
+//D4, D5, D6, D7);
 
 void setup() {
   Serial.begin(19200); // Default baudrate.
-  lcd.begin(16, 2); // Change this for other screen sizes.
+  lcd.begin(LCDW, LCDH); // Change this for other screen sizes.
+  lcd.noCursor();
 
   analogWrite(BR, 0); // Set maximum brightness.
 
-  lcd.print("Arduino");
+  lcd.print(sprinf("ArduLCD Version %d",VERSION));
   lcd.setCursor(1, 1);
   lcd.print("Matrix Orbital!");
 }

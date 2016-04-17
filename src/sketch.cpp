@@ -33,6 +33,13 @@ Licence Listed as:  GNU GPL v3
  */
 
 #include <LiquidCrystal.h>
+#include <avr/io.h>
+#include <util/delay.h>
+#include <Arduino.h>
+
+// And this is ths Hardware serial port (which is also bound to the UART->USB chip)
+#include <HardwareSerial.cpp>
+
 
 // You can define your own pins here.
 #define RS 12

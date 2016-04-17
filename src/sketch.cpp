@@ -62,7 +62,8 @@ Licence Listed as:  GNU GPL v3
 // Define the size of your LCD here
 #define LCDW 24
 #define LCDH 2
-LiquidCrystal lcd(RS, E, D7, D6, D5, D4, D3, D2, D1, D0);
+//LiquidCrystal lcd(RS, E, D7, D6, D5, D4, D3, D2, D1, D0);
+LiquidCrystal lcd(RS, E, D0, D1, D2, D3, D4, D5, D6, D7);
 //D4, D5, D6, D7);
 
 void setup() {

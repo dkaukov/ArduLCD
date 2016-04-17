@@ -69,7 +69,6 @@ LiquidCrystal lcd(RS, E, D0, D1, D2, D3, D4, D5, D6, D7);
 void setup() {
 	Serial.begin(19200); // Default baudrate.
 	lcd.begin(LCDW, LCDH); // Change this for other screen sizes.
-	lcd.noCursor();
 
 	analogWrite(BR, 0); // Set maximum brightness.
 
@@ -129,8 +128,10 @@ void loop() {
                   break;
                 case 35: 
 				  Serial.print("417264754C4344");// Read serial number
+				  break;
                 case 36: 
 				  Serial.print(VERSION); // Read version number
+				  break;
                 case 54: // Read version number
                   Serial.print(VERSION);
                   break;
@@ -161,7 +162,7 @@ void loop() {
                 case 88: // Clear screen
                   lcd.clear();
                   break;
-                case 35: // Place large number
+//                case 35: // Place large number
                 case 38: // Poll key presses
                 case 51: // Change I2C slave address (1 parameter, address)
                 case 57: // Change baud rate (1 parameter, baud rate)

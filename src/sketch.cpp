@@ -79,18 +79,20 @@ void setup() {
 }
 
 //Fast wait until byte is received, then returns it. 
+char cmd;
 char serial_getch() {
 	while(1) {
 		cmd = Serial.read();
 		if (cmd == -1) { continue; }
 		return cmd;
-		}
 	}
+}
+
 
 void loop() {
-	char rxbyte;
+	char rxbyte,temp;
 	while(1) {
-		rxbyte = read();
+		rxbyte = serial_getch();
 		if (rxbyte == 254) {
 			switch (serial_getch()) {
 			    case 71: // Set cursor position (2 parameters, column, row)
@@ -203,8 +205,9 @@ void loop() {
                    and parameter byte is discarded. */
                   temp = serial_getch();
                   break;
-  }
+  			}
 
-  // Otherwise its a plain char so we print it to the LCD.
-  lcd.write(rxbyte);
+		    // Otherwise its a plain char so we print it to the LCD.
+			lcd.write(rxbyte);
+		}
 }

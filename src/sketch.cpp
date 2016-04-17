@@ -93,7 +93,7 @@ void loop() {
 	char rxbyte,temp;
 	while(1) {
 		rxbyte = serial_getch();
-		if (rxbyte == 254) {
+		if (rxbyte == 0xFE) {
 			switch (serial_getch()) {
 			    case 71: // Set cursor position (2 parameters, column, row)
 				  lcd.setCursor(serial_getch() - 1, serial_getch() - 1);
@@ -137,7 +137,11 @@ void loop() {
                   break;
                 case 55: // Read module type
                   Serial.print(9); // 9 for LK204-25
+				  Serial.print("\n");
                   break;
+				case 58: //Clear the display
+				  lcd.clear();
+				  break;
                 case 80: // Set contrast (1 parameter, contrast)
                   analogWrite(BR, 0xFF-serial_getch());
                   break;

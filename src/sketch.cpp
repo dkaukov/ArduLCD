@@ -127,8 +127,10 @@ void loop() {
                     lcd.print(serial_getch());
                   }
                   break;
-                  //case 35: // Read serial number
-                  //case 36: // Read version number
+                case 35: 
+				  Serial.print("417264754C4344");// Read serial number
+                case 36: 
+				  Serial.print(VERSION); // Read version number
                 case 54: // Read version number
                   Serial.print(VERSION);
                   break;

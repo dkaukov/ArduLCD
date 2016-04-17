@@ -210,4 +210,5 @@ void loop() {
 		    // Otherwise its a plain char so we print it to the LCD.
 			lcd.write(rxbyte);
 		}
+	}
 }
